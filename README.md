@@ -48,15 +48,42 @@
     senhaunica_logout:
         path: /senhaunica/logout
         
+app/config/config.yml
         
-        
-   hwi_oauth:
-    firewall_names: [secured_area]
-    resource_owners:
-        auth0:
-            type:                oauth1
-            class:               'Uspdev\SenhaUnicaResourceOwnerr'
-            base_url:            https://localhost:8000
-            client_id:           YOUR_CLIENT_ID
-            client_secret:       YOUR_CLIENT_SECRET
-            redirect_uri:        https://localhost:8000/callback
+       hwi_oauth:
+        firewall_names: [secured_area]
+        resource_owners:
+            auth0:
+                type:                oauth1
+                class:               'Uspdev\SenhaUnicaResourceOwnerr'
+                base_url:            https://localhost:8000
+                client_id:           YOUR_CLIENT_ID
+                client_secret:       YOUR_CLIENT_SECRET
+                redirect_uri:        https://localhost:8000/callback
+               
+config/packages/security.yaml    
+
+    security:
+        providers:
+            hwi:
+                id: hwi_oauth.user.provider
+
+    firewalls:
+        secured_area:
+            anonymous: ~
+            oauth:
+                resource_owners:
+                    auth0: "/auth0/callback"
+                login_path:        /login
+                use_forward:       false
+                failure_path:      /login
+
+                oauth_user_provider:
+                    service: hwi_oauth.user.provider
+            logout:
+                path:   /auth0/logout
+                target: /
+
+    access_control:
+        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/secured, roles: ROLE_OAUTH_USER }
