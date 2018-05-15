@@ -1,6 +1,7 @@
     composer create-project symfony/skeleton usp
 
     composer require orm-pack annotations validator template security-bundle make form
+    composer require hwi/oauth-bundle php-http/guzzle6-adapter php-http/httplug-bundle
 
     composer require server maker-bundle --dev 
   
