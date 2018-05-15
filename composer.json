@@ -1,0 +1,24 @@
+{
+    "name": "uspdev/senhaunica-hwi",
+    "description": "Senhaunica OAuth1 Provider for Symfony",
+    "minimum-stability": "dev",
+    "homepage": "https://github.com/senhaunica-hwi",
+    "type": "library",
+    "license": "GPL-2.0-or-later",
+
+    "authors": [{
+        "name": "Thiago Gomes Veríssimo",
+        "email": "thiago.verissimo@usp.br",
+        "homepage": "https://github.com/thiagogomesverissimo"
+    }],
+    "require": {
+        "hwi/oauth-bundle": "^0.6.2",
+        "php-http/guzzle6-adapter": "^1.1",
+        "php-http/httplug-bundle": "^1.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "Uspdev\\": "src/"
+        }
+    }
+}

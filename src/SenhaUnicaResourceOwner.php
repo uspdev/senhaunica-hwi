@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace Uspdev;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
