@@ -1,13 +1,9 @@
     composer create-project symfony/skeleton usp
 
+    composer require orm-pack annotations validator template security-bundle make form
 
-    composer require symfony/orm-pack
-    composer require annotations validator template security-bundle make form
-
-    composer require --dev maker-bundle
-    composer require server --dev
-
-
+    composer require server maker-bundle --dev 
+  
     no .env: 
     DATABASE_URL=mysql://master:master@localhost:3306/senhaunica
 
