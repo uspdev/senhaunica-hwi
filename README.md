@@ -4,6 +4,8 @@
     composer require hwi/oauth-bundle php-http/guzzle6-adapter php-http/httplug-bundle
 
     composer require server maker-bundle --dev 
+    
+    composer require uspdev/senhaunica-hwi
   
     no .env: 
     DATABASE_URL=mysql://master:master@localhost:3306/senhaunica
