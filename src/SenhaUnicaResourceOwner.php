@@ -3,31 +3,25 @@
 namespace Uspdev;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use HWI\Bundle\OAuthBundle\OAuth\ResourceOwner\GenericOAuth1ResourceOwner;
 
 class SenhaUnicaResourceOwner extends GenericOAuth1ResourceOwner
 {
     /**
      * {@inheritdoc}
      */
-    protected $paths = array(
-        'identifier' => 'id_str',
-        'nickname' => 'screen_name',
-        'realname' => 'name',
-        'profilepicture' => 'profile_image_url_https',
-        'email' => 'email',
-    );
-
-    /**
-     * {@inheritdoc}
-     */
     public function getUserInformation(array $accessToken, array $extraParameters = array())
     {
-        if ($this->options['include_email']) {
-            $this->options['infos_url'] = $this->normalizeUrl($this->options['infos_url'], array('include_email' => 'true'));
-        }
-
-        return parent::getUserInformation($accessToken, $extraParameters);
+        
     }
+
+    public function getAuthorizationUrl($redirectUri, array $extraParameters = array())
+    {
+        $token = $this->getRequestToken($redirectUri, $extraParameters);
+
+        return $this->normalizeUrl($this->options['authorization_url'], array('oauth_token' => $token['oauth_token'], 'callback_id' => getenv('SENHAUNICA_CALLBACK_ID')));
+    }
+
 
     /**
      * {@inheritdoc}
@@ -42,9 +36,14 @@ class SenhaUnicaResourceOwner extends GenericOAuth1ResourceOwner
             'access_token_url' => 'https://uspdigital.usp.br/wsusuario/oauth/access_token',
             'infos_url' => 'https://uspdigital.usp.br/wsusuario/oauth/usuariousp',
         ));
+    }
 
-        $resolver->setDefined('x_auth_access_type');
-        $resolver->setAllowedValues('x_auth_access_type', array('read', 'write'));
-        $resolver->setAllowedTypes('include_email', 'bool');
+//TESTE
+    public function getData() {
+        return $this->data;
+    }
+
+    public function getRoles() {
+        return array('ROLE_OAUTH_USER');
     }
 }

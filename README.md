@@ -16,25 +16,20 @@
     php bin/console server:run
 
 
-    {% if app.user %}
-        logado
-    {% elseif not app.user %}
-       não logado
-    {% endif %}
+{% if app.user %}
+    Logado {{ app.user.username }}!<br/>
+    {{ dump(app.user) }}
+    <a href="{{ url('secured') }}">Protected route</a>
+    <a href="{{ logout_url("secured_area") }}">
+        <button>Logout</button>
+    </a>
+{% else %}
+    <h1>Symfony Auth0 Quickstart</h1>
+    <a href="/connect/auth0"><button>Login</button></a>
+{% endif %}
+
     
-    // app/AppKernel.php
-
-    public function registerBundles()
-    {
-        $bundles = array(
-            // ...
-            new Http\HttplugBundle\HttplugBundle(), // If you require the php-http/httplug-bundle package.
-            new HWI\Bundle\OAuthBundle\HWIOAuthBundle(),
-        );
-    }
-
-
-    config/routes.yaml
+config/routes.yaml
 
     hwi_oauth_redirect:
         resource: "@HWIOAuthBundle/Resources/config/routing/redirect.xml"
@@ -50,20 +45,20 @@
     senhaunica_logout:
         path: /senhaunica/logout
         
-app/config/config.yml
+config/packages/hwi_oauth.yaml
         
-       hwi_oauth:
-        firewall_names: [secured_area]
-        resource_owners:
-            auth0:
-                type:                oauth1
-                class:               'Uspdev\SenhaUnicaResourceOwnerr'
-                base_url:            https://localhost:8000
-                client_id:           YOUR_CLIENT_ID
-                client_secret:       YOUR_CLIENT_SECRET
-                redirect_uri:        https://localhost:8000/callback
+    hwi_oauth:
+      firewall_names: [secured_area]
+      resource_owners:
+        senhaunica:
+          type: 'oauth1'
+          class: 'Uspdev\SenhaUnicaResourceOwner'
+          client_id: '%env(SENHAUNICA_ID)%'
+          client_secret: '%env(SENHAUNICA_SECRET)%'
+          redirect_uri: 'https://localhost:8000/callback'
+
                
-config/packages/security.yaml    
+config/packages/security.yaml
 
     security:
         providers:
@@ -75,7 +70,7 @@ config/packages/security.yaml
             anonymous: ~
             oauth:
                 resource_owners:
-                    auth0: "/auth0/callback"
+                    senhaunica: "/senhaunica/callback"
                 login_path:        /login
                 use_forward:       false
                 failure_path:      /login
@@ -83,7 +78,7 @@ config/packages/security.yaml
                 oauth_user_provider:
                     service: hwi_oauth.user.provider
             logout:
-                path:   /auth0/logout
+                path:   /logout
                 target: /
 
     access_control:
