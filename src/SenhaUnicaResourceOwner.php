@@ -12,7 +12,7 @@ class SenhaUnicaResourceOwner extends GenericOAuth1ResourceOwner
      */
     public function getUserInformation(array $accessToken, array $extraParameters = array())
     {
-        
+        return parent::getUserInformation($accessToken, $extraParameters);
     }
 
     public function getAuthorizationUrl($redirectUri, array $extraParameters = array())
