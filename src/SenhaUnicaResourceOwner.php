@@ -14,16 +14,15 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class SenhaUnicaResourceOwner extends GenericOAuth1ResourceOwner
 {
-  protected $paths = array(
+
+    protected $paths = array(
         'identifier' => 'loginUsuario',
         'nickname' => 'nomeUsuario',
     );
+
     public function getUserInformation(array $accessToken, array $extraParameters = array())
     {
-	//$response = parent::getUserInformation($accessToken, $extraParameters);
-        //$responseData = $response->getData(); 
-
-    $parameters = array_merge([
+        $parameters = array_merge([
             'oauth_consumer_key' => $this->options['client_id'],
             'oauth_timestamp' => time(),
             'oauth_nonce' => $this->generateNonce(),
@@ -40,39 +39,54 @@ class SenhaUnicaResourceOwner extends GenericOAuth1ResourceOwner
             $accessToken['oauth_token_secret'],
             $this->options['signature_method']
         );
-        $content = $this->doGetUserInformationRequest($url, $parameters); 
-        $response = $this->getUserResponse(); 
-        $response->setData($content instanceof ResponseInterface ? (string) $content->getBody() : $content);
-        $response->setResourceOwner($this); 
-        $response->setOAuthToken(new OAuthToken($accessToken)); echo "<pre>"; var_dump($response->getData()); die();
-$responseData = $response->getData(); 
+        $content = $this->doGetUserInformationRequest($url, $parameters);
 
-	print_r($responseData); die();
+
+        $x = (string) $content->getBody();
+        echo "<pre>"; print_r($x); die('sss');
+
+        $response = $this->getUserResponse();
+        $response->setData($content instanceof ResponseInterface ? (string) $content->getBody() : $content);
+        $response->setResourceOwner($this);
+        $response->setOAuthToken(new OAuthToken($accessToken));
+
+        return $response;
     }
 
     protected function doGetUserInformationRequest($url, array $parameters = array())
     {
-        return $this->httpRequest($url, null, array(), null, $parameters);
+
+         //echo "<pre>"; print_r($this->httpRequest($url, null, array(), 'POST', $parameters)); die('sss');
+        return $this->httpRequest($url, null, array(), 'POST', $parameters);
     }
 
-    protected function httpRequest($url, $content = null, array $headers = array(), $method = null, array $parameters = array())
+    protected function getResponseContent(ResponseInterface $rawResponse)
     {
-        foreach ($parameters as $key => $value) {
-            $parameters[$key] = $key.'="'.rawurlencode($value).'"';
+        // First check that content in response exists, due too bug: https://bugs.php.net/bug.php?id=54484
+        $content = (string) $rawResponse->getBody();
+
+       
+
+        if (!$content) {
+            return array();
         }
-        if (!$this->options['realm']) {
-            array_unshift($parameters, 'realm="'.rawurlencode($this->options['realm']).'"');
+        $response = json_decode($content, true);
+        
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            parse_str($content, $response);
         }
-        $headers['Authorization'] = 'OAuth '.implode(', ', $parameters);
-        return parent::httpRequest($url, $content, $headers, $method);
+        return $response;
     }
+
 
   
     public function getAuthorizationUrl($redirectUri, array $extraParameters = array())
     {
         $token = $this->getRequestToken($redirectUri, $extraParameters);
 
-        return $this->normalizeUrl($this->options['authorization_url'], array('oauth_token' => $token['oauth_token'], 'callback_id' => getenv('SENHAUNICA_CALLBACK_ID')));
+        return $this->normalizeUrl($this->options['authorization_url'], 
+                      array('oauth_token' => $token['oauth_token'], 
+                            'callback_id' => getenv('SENHAUNICA_CALLBACK_ID')));
     }
 
 
