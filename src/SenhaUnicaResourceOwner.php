@@ -14,10 +14,14 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class SenhaUnicaResourceOwner extends GenericOAuth1ResourceOwner
 {
-
-    protected $paths = array(
+   protected $paths = array(
         'identifier' => 'loginUsuario',
-        'nickname' => 'nomeUsuario',
+        'nickname' => 'loginUsuario',
+        'firstname' => 'nomeUsuario',
+        'lastname' => null,
+        'realname' => 'nomeUsuario',
+        'email' => 'emailPrincipalUsuario',
+        'profilepicture' => null,
     );
 
     public function getUserInformation(array $accessToken, array $extraParameters = array())
@@ -41,9 +45,8 @@ class SenhaUnicaResourceOwner extends GenericOAuth1ResourceOwner
         );
         $content = $this->doGetUserInformationRequest($url, $parameters);
 
-
-        $x = (string) $content->getBody();
-        echo "<pre>"; print_r($x); die('sss');
+        // developers: uncomment this lines to inspect data returned by USP
+        //echo "<pre>"; print_r((string) $content->getBody()); die();
 
         $response = $this->getUserResponse();
         $response->setData($content instanceof ResponseInterface ? (string) $content->getBody() : $content);
@@ -55,31 +58,9 @@ class SenhaUnicaResourceOwner extends GenericOAuth1ResourceOwner
 
     protected function doGetUserInformationRequest($url, array $parameters = array())
     {
-
-         //echo "<pre>"; print_r($this->httpRequest($url, null, array(), 'POST', $parameters)); die('sss');
         return $this->httpRequest($url, null, array(), 'POST', $parameters);
     }
 
-    protected function getResponseContent(ResponseInterface $rawResponse)
-    {
-        // First check that content in response exists, due too bug: https://bugs.php.net/bug.php?id=54484
-        $content = (string) $rawResponse->getBody();
-
-       
-
-        if (!$content) {
-            return array();
-        }
-        $response = json_decode($content, true);
-        
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            parse_str($content, $response);
-        }
-        return $response;
-    }
-
-
-  
     public function getAuthorizationUrl($redirectUri, array $extraParameters = array())
     {
         $token = $this->getRequestToken($redirectUri, $extraParameters);
